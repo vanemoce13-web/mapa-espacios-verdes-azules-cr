@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Registrar un aporte | Espacios verdes y azules urbanos</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css">
   <style>
     :root{--verde:#176b50;--verde2:#23866a;--azul:#1976a3;--fondo:#f3f7f5;--texto:#24312c;--borde:#d8e2dd;--error:#a52323}
     *{box-sizing:border-box} body{margin:0;font-family:Arial,sans-serif;background:var(--fondo);color:var(--texto);line-height:1.45}
@@ -32,24 +33,26 @@
       <form id="survey" novalidate>
         <section class="step active" data-step="1">
           <h2>1. Información y consentimiento</h2>
-          <p>Los espacios verdes y azules urbanos proporcionan beneficios relacionados con la recreación, el bienestar, la convivencia, la conexión con la naturaleza, el aprendizaje y la identidad de las personas.</p>
-          <p>Esta encuesta busca conocer cómo la ciudadanía utiliza, percibe y valora estos lugares. Su aporte permitirá construir colaborativamente un mapa de espacios verdes y azules urbanos de Costa Rica. Completarla toma aproximadamente de 5 a 7 minutos.</p>
-          <p><strong>Espacios verdes urbanos:</strong> parques, plazas arboladas, jardines, bosques urbanos, áreas recreativas con vegetación, huertas comunitarias, corredores verdes y otros sitios urbanos donde la vegetación es un elemento importante.</p>
-          <p><strong>Espacios azules urbanos:</strong> ríos, quebradas, lagos, lagunas, manglares, estuarios, embalses, estanques, fuentes, playas y otros sitios urbanos relacionados con el agua. Si el lugar combina vegetación y agua, seleccione la categoría con la que lo identifica principalmente.</p>
-          <p>Su participación es voluntaria y anónima. No solicitaremos su nombre, identificación, correo electrónico ni dirección residencial. La información podrá utilizarse con fines científicos, educativos y de divulgación. La ubicación del espacio y las respuestas categóricas anonimizadas podrán visualizarse en un mapa público. Las respuestas abiertas se revisarán antes de publicarse.</p>
+          <p>Los espacios verdes y azules urbanos aportan beneficios para la recreación, el bienestar, la convivencia, el aprendizaje y la conexión con la naturaleza.</p>
+          <p>Esta encuesta busca conocer cómo las personas utilizan y valoran estos lugares para construir colaborativamente un mapa de Costa Rica. Completarla toma entre 5 y 7 minutos.</p>
+          <p><strong>Espacios verdes:</strong> parques, jardines, bosques urbanos, huertas, corredores verdes y otras áreas urbanas con vegetación.</p>
+          <p><strong>Espacios azules:</strong> ríos, quebradas, lagunas, manglares, estanques, fuentes, playas y otros espacios urbanos relacionados con el agua.</p>
+          <p>Si el lugar combina vegetación y agua, seleccione la categoría con la que más lo identifica.</p>
+          <p>Su participación es voluntaria. No solicitamos nombre, identificación, correo electrónico ni dirección residencial. Si autoriza la visualización pública, solo se mostrarán la ubicación del espacio evaluado y algunas respuestas categóricas, sin datos que permitan identificarle directamente. Las respuestas abiertas y los datos sociodemográficos no se publicarán.</p>
+          <p>Si participa, pero no autoriza la visualización pública, su respuesta podrá utilizarse para la investigación, pero no aparecerá como punto ni será incluida en las estadísticas del visor público.</p>
           <div class="field"><span class="legend">Tengo 18 años o más, he leído la información y acepto participar voluntariamente. <span class="required">*</span></span><div class="choices">
             <label class="choice"><input type="radio" name="consentimiento" value="Sí" required> Sí, acepto participar.</label>
             <label class="choice"><input type="radio" name="consentimiento" value="No"> No acepto participar.</label>
           </div></div>
-          <div class="field"><span class="legend">¿Autoriza que la ubicación del espacio y sus respuestas anonimizadas aparezcan en el mapa público? <span class="required">*</span></span><div class="choices">
-            <label class="choice"><input type="radio" name="autoriza_mapa" value="Sí" required> Sí, autorizo su visualización pública anonimizada.</label>
-            <label class="choice"><input type="radio" name="autoriza_mapa" value="No"> Acepto participar, pero no deseo que mi registro individual aparezca en el mapa.</label>
+          <div class="field"><span class="legend">¿Autoriza que la ubicación del espacio evaluado y algunas de sus respuestas aparezcan de forma anonimizada en el mapa público? <span class="required">*</span></span><div class="choices">
+            <label class="choice"><input type="radio" name="autoriza_mapa" value="Sí" required> Sí, autorizo que mi aporte aparezca de forma anonimizada en el mapa y sus estadísticas.</label>
+            <label class="choice"><input type="radio" name="autoriza_mapa" value="No"> Acepto participar, pero no autorizo que mi aporte aparezca en el mapa ni en sus estadísticas públicas.</label>
           </div></div>
         </section>
 
         <section class="step" data-step="2">
           <h2>2. Identificación del lugar</h2>
-          <div class="field"><label>Seleccione el espacio en el mapa <span class="required">*</span></label><p class="help">Haga clic dentro del espacio que desea valorar. No marque su vivienda.</p><div id="map"></div><div id="coords" class="coords">Todavía no ha seleccionado un punto.</div><input type="hidden" name="latitud" id="latitud"><input type="hidden" name="longitud" id="longitud"></div>
+          <div class="field"><label>Seleccione el espacio en el mapa <span class="required">*</span></label><p class="help">Utilice la lupa para buscar y acercarse a un lugar. La búsqueda no registra ningún punto: para seleccionar el espacio que desea valorar, haga clic dentro de este en el mapa. No marque su vivienda.</p><div id="map"></div><div id="coords" class="coords">Todavía no ha seleccionado un punto.</div><input type="hidden" name="latitud" id="latitud"><input type="hidden" name="longitud" id="longitud"></div>
           <div class="field"><label for="nombre_lugar">¿Cuál es el nombre del lugar? <span class="required">*</span></label><input id="nombre_lugar" name="nombre_lugar" type="text" maxlength="120" required placeholder="Ej.: Parque Metropolitano La Sabana"></div>
           <div class="field"><label for="tipo_general">¿Cómo identifica principalmente este lugar? <span class="required">*</span></label><p class="help">Aunque el lugar combine vegetación y agua, seleccione la categoría que considere prioritaria.</p><select id="tipo_general" name="tipo_general" required><option value="">Seleccione…</option><option>Espacio verde</option><option>Espacio azul</option></select></div>
           <div class="field hidden" id="subtipoWrap"><label for="subtipo">¿Qué tipo de espacio es? <span class="required">*</span></label><select id="subtipo" name="subtipo"></select></div>
@@ -108,6 +111,7 @@
     <div id="success" class="success hidden"><h2>¡Muchas gracias por su aporte!</h2><p>La respuesta fue enviada. Su participación contribuye a conocer cómo las personas utilizan, perciben y valoran los espacios verdes y azules urbanos de Costa Rica.</p><div class="nav"><button class="btn primary" id="anotherBtn">Registrar otro lugar</button><a class="btn secondary" href="visor.html" style="text-decoration:none">Ver mapa de resultados</a></div></div>
   </div></main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
   <script>
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyUUI_PSRnKgJbKsJafKLy64dRPiW0ZEPjWJ52Q8Fkle9DfIqAXeqHNlHktx2P4hcGw/exec";
     const totalSteps=6; let currentStep=1, map, marker;
@@ -119,7 +123,28 @@
     const qualities={limpieza:"Limpieza y mantenimiento",seguridad:"Seguridad percibida",acceso:"Facilidad de acceso",tranquilidad:"Tranquilidad",naturaleza:"Presencia y estado de la vegetación o del agua",paisaje:"Belleza y naturalidad del paisaje"};
     function matrixRows(items,prefix){return Object.entries(items).map(([key,label])=>`<tr><td>${label} <span class="required">*</span></td>${[1,2,3,4,5,"NA"].map(v=>`<td><input type="radio" name="${prefix}_${key}" value="${v}" required aria-label="${label}: ${v}"></td>`).join("")}</tr>`).join("")}
     document.getElementById("experienceMatrix").innerHTML=matrixRows(experiences,"exp"); document.getElementById("qualityMatrix").innerHTML=matrixRows(qualities,"cal");
-    function initMap(){map=L.map("map",{minZoom:7,maxZoom:18,maxBounds:[[7.6,-86.2],[11.4,-82.3]],maxBoundsViscosity:.8}).setView([9.75,-84.1],8);L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap"}).addTo(map);map.on("click",e=>{if(marker)marker.setLatLng(e.latlng);else marker=L.marker(e.latlng).addTo(map);document.getElementById("latitud").value=e.latlng.lat.toFixed(6);document.getElementById("longitud").value=e.latlng.lng.toFixed(6);document.getElementById("coords").textContent=`Punto seleccionado: ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`})}
+    function initMap(){
+      map=L.map("map",{minZoom:7,maxZoom:18,maxBounds:[[7.6,-86.2],[11.4,-82.3]],maxBoundsViscosity:.8}).setView([9.75,-84.1],8);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap"}).addTo(map);
+      L.Control.geocoder({
+        position:"topleft",
+        collapsed:true,
+        placeholder:"Buscar un lugar en Costa Rica…",
+        errorMessage:"No se encontraron lugares.",
+        defaultMarkGeocode:false,
+        geocoder:L.Control.Geocoder.nominatim({geocodingQueryParams:{countrycodes:"cr",limit:5,addressdetails:1}})
+      }).on("markgeocode",e=>{
+        const result=e.geocode;
+        if(result.bbox)map.fitBounds(result.bbox,{maxZoom:16,padding:[25,25]});
+        else map.setView(result.center,16);
+      }).addTo(map);
+      map.on("click",e=>{
+        if(marker)marker.setLatLng(e.latlng);else marker=L.marker(e.latlng).addTo(map);
+        document.getElementById("latitud").value=e.latlng.lat.toFixed(6);
+        document.getElementById("longitud").value=e.latlng.lng.toFixed(6);
+        document.getElementById("coords").textContent=`Punto seleccionado: ${e.latlng.lat.toFixed(5)}, ${e.latlng.lng.toFixed(5)}`;
+      });
+    }
     document.getElementById("tipo_general").addEventListener("change",e=>{const wrap=document.getElementById("subtipoWrap"),sel=document.getElementById("subtipo"),opts=subtypes[e.target.value];if(!opts){wrap.classList.add("hidden");sel.required=false;sel.innerHTML=""}else{sel.innerHTML='<option value="">Seleccione…</option>'+opts.map(x=>`<option>${x}</option>`).join("");sel.required=true;wrap.classList.remove("hidden")}const isWater=e.target.value==="Espacio azul";document.querySelectorAll('#problema_principal option[data-water="true"]').forEach(o=>o.hidden=!isWater);const natureLabel=document.querySelector('#qualityMatrix input[name="cal_naturaleza"]')?.closest('tr')?.querySelector('td');if(natureLabel)natureLabel.innerHTML=(isWater?"Presencia y estado del agua":"Presencia y estado de la vegetación")+' <span class="required">*</span>';});
     document.querySelectorAll('[data-max]').forEach(group=>{const boxes=[...group.querySelectorAll('input[type="checkbox"]')],max=+group.dataset.max,counter=document.getElementById(group.dataset.counter);boxes.forEach(box=>box.addEventListener('change',()=>{const selected=boxes.filter(x=>x.checked);if(selected.length>max){box.checked=false;alert(`Puede seleccionar como máximo ${max} opciones.`)}counter.textContent=`${boxes.filter(x=>x.checked).length} de ${max} seleccionadas`;toggleOtherFields()}))});
     const benefitBoxes=[...document.querySelectorAll('input[name="beneficios"]')]; benefitBoxes.forEach(b=>b.addEventListener("change",()=>{if(b.dataset.exclusive==="true"&&b.checked)benefitBoxes.filter(x=>x!==b).forEach(x=>x.checked=false);if(b.dataset.exclusive!=="true"&&b.checked)benefitBoxes.filter(x=>x.dataset.exclusive==="true").forEach(x=>x.checked=false);const selected=benefitBoxes.filter(x=>x.checked);if(selected.length>5){b.checked=false;alert("Puede seleccionar como máximo cinco beneficios.");return}document.getElementById("benefitCounter").textContent=`${benefitBoxes.filter(x=>x.checked).length} de 5 seleccionados`;const current=benefitBoxes.filter(x=>x.checked),main=document.getElementById("beneficio_principal"),old=main.value;main.innerHTML='<option value="">Seleccione…</option>'+current.map(x=>`<option>${x.value}</option>`).join("");if(current.some(x=>x.value===old))main.value=old;toggleOtherFields()}));

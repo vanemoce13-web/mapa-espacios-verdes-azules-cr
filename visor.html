@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Visor de espacios verdes y azules urbanos</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.css">
   <style>
     :root{--verde:#176b50;--azul:#1976a3;--fondo:#f3f7f5;--texto:#24312c;--borde:#d8e2dd}
     *{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:var(--texto);background:var(--fondo)}
@@ -43,11 +44,26 @@
     <details class="glossary"><summary>Descripción de los servicios de regulación, mantenimiento, hábitat y provisión</summary><dl id="otherGlossary"></dl></details>
   </section></main>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder@2.4.0/dist/Control.Geocoder.js"></script>
   <script>
     const WEB_APP_URL="https://script.google.com/macros/s/AKfycbyUUI_PSRnKgJbKsJafKLy64dRPiW0ZEPjWJ52Q8Fkle9DfIqAXeqHNlHktx2P4hcGw/exec";
     const map=L.map('map',{minZoom:7,maxZoom:18,maxBounds:[[7.6,-86.2],[11.4,-82.3]],maxBoundsViscosity:.8}).setView([9.75,-84.1],8);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'&copy; OpenStreetMap'}).addTo(map);
     const layer=L.layerGroup().addTo(map);let records=[];
+    const placeSearch=L.Control.geocoder({
+      position:'topleft',
+      collapsed:true,
+      placeholder:'Buscar un lugar en Costa Rica…',
+      errorMessage:'No se encontraron lugares.',
+      defaultMarkGeocode:false,
+      geocoder:L.Control.Geocoder.nominatim({
+        geocodingQueryParams:{countrycodes:'cr',limit:5,addressdetails:1}
+      })
+    }).on('markgeocode',function(e){
+      const result=e.geocode;
+      if(result.bbox){map.fitBounds(result.bbox,{maxZoom:16,padding:[25,25]})}
+      else{map.setView(result.center,16)}
+    }).addTo(map);
     const typeColors={"Espacio verde":"#1f8a4c","Espacio azul":"#1976d2"};
     const culturalDescriptions={"Recreación":"Oportunidades para disfrutar el tiempo libre y realizar actividades recreativas.","Actividad física":"Contribución al movimiento, el ejercicio y el bienestar corporal.","Relajación":"Descanso, recuperación emocional y reducción del estrés.","Tranquilidad":"Posibilidad de experimentar calma y alejarse del ruido o las presiones urbanas.","Conexión con la naturaleza":"Contacto y vínculo personal con plantas, animales, agua y procesos naturales.","Interacción social":"Oportunidades para encontrarse, convivir y compartir con otras personas.","Vínculos familiares o comunitarios":"Fortalecimiento de relaciones familiares, vecinales o comunitarias.","Estética":"Disfrute de la belleza y de las cualidades visuales del paisaje.","Inspiración":"Estímulo para la creatividad, el arte, la reflexión o las ideas.","Aprendizaje":"Oportunidades para conocer la naturaleza, la cultura o la historia.","Identidad y memoria":"Sentido de pertenencia, recuerdos y vínculos emocionales con el lugar.","Patrimonio":"Importancia histórica o cultural reconocida en el espacio.","Espiritualidad":"Experiencias espirituales, religiosas o de conexión profunda.","Libertad y descubrimiento":"Sensaciones de libertad, exploración y descubrimiento.","Ciencia y fotografía":"Oportunidades para fotografía, investigación, observación o ciencia ciudadana.","Otro":"Otros beneficios culturales descritos por las personas participantes."};
     const otherDescriptions={"Sombra y temperatura":"Regulación de la temperatura y provisión de sombra.","Calidad del aire":"Retención de contaminantes y contribución a una mejor calidad del aire.","Reducción de ruido":"Amortiguación o disminución del ruido ambiental.","Regulación de agua":"Regulación, retención o almacenamiento del agua.","Disminución de inundaciones":"Reducción de escorrentía y contribución al control de inundaciones.","Protección de suelo o riberas":"Protección frente a erosión y estabilización de suelos o riberas.","Hábitat":"Mantenimiento de espacios para plantas, animales y otros organismos.","Recursos":"Provisión de alimentos, plantas medicinales u otros recursos naturales."};
